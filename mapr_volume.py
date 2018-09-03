@@ -19,7 +19,7 @@ author: "Davinder Pal (@116davinder)"
 short_description: Manage MapR Volume by rest api.
 description:
    - Manage MapR Services
-        (https://mapr.com/docs/52/ReferenceGuide/REST-API-Syntax.html)
+        (hxxx)
 options:
   username:
     description:
