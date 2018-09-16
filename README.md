@@ -1,5 +1,7 @@
 ## MapR Ansible Modules
 
+[![Build Status](https://travis-ci.org/116davinder/mapr-ansible-modules.svg?branch=master)]
+
 ## export ansible library path
 export ANSIBLE_LIBRARY=\`pwd\`
 
