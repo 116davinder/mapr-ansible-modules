@@ -16,10 +16,11 @@ DOCUMENTATION = '''
 module: mapr_blacklistuser
 version_added: "0.1"
 author: "Davinder Pal (@116davinder)"
-short_description: Manage MapR Volume by rest api.
+short_description: Add user to mapr blacklist
 description:
-   - Manage MapR Services
-        (hxxx)
+   - Manage MapR BlackList Services
+     if you want to remove user from blacklist
+     (https://mapr.com/docs/52/SecurityGuide/HowTicketsWork.html)
 options:
   username:
     description:
@@ -122,14 +123,13 @@ def main():
         module.fail_json(msg="Username and Password should be defined")
     elif not mcsUrl:
         module.fail_json(msg="MCS Url Should be Defined")
-    elif module.params['list_user'] == True and module.params['user'] != None:
-        module.fail_json(msg="Both list_user and user can't be set together.")
+    elif module.params['list_user'] and module.params['user'] not None:
+        module.fail_json(msg="Only define one of list_user or user")
     else:
-        if module.params['list_user'] == True:
+        if module.params['list_user']:
             url_parameters = "listusers"
-        elif module.params['user'] != None:
+        elif module.params['user'] not None:
             url_parameters = "users?name=" + module.params['user']
-        
         complete_url = "https://" + mcsUrl + ":" + mcsPort + \
             "/rest/blacklist/" + url_parameters
         headers = {'Content-Type': 'application/json'}
