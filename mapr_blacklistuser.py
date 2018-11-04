@@ -111,7 +111,6 @@ def main():
 
     maprUsername = module.params['username']
     maprPassword = module.params['password']
-    volumeName = module.params['volume_name']
     mcsUrl = module.params['mcs_url']
     mcsPort = module.params['mcs_port']
 
