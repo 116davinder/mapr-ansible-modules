@@ -1,0 +1,4 @@
+- [] mapr-volume support
+- [x] mapr-blacklistuser support
+- [] table operations
+- [] stream operations
