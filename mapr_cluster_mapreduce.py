@@ -83,6 +83,7 @@ EXAMPLES = '''
     mcs_url: demo.mapr.com
     mcs_port: 8443
     validate_certs: false
+    list_mapreduce_mode: false
     mapreduce_mode: classic/yarn
 '''
 
@@ -109,11 +110,16 @@ def main():
         )
     )
 
+    # default value
+    mapReduceMode = None
+
     maprUsername = module.params['username']
     maprPassword = module.params['password']
     mcsUrl = module.params['mcs_url']
     mcsPort = module.params['mcs_port']
-    mapReduceMode = module.params['mapreduce_mode'].lower()
+
+    if not module.params['list_mapreduce_mode']:
+        mapReduceMode = module.params['mapreduce_mode'].lower()
 
     # Hack to add basic auth username and password the way fetch_url expects
     module.params['url_username'] = maprUsername
@@ -125,23 +131,21 @@ def main():
     if not maprUsername or not maprPassword:
         module.fail_json(msg="Username and Password should be defined")
     elif not mcsUrl:
-        module.fail_json(msg="MCS Url Should be Defined")
-    elif module.params['list_mapreduce_mode'] and mapReduceMode not None:
-        module.fail_json(msg="list_mapreduce_mode or mapreduce_mode can`t be true at same time")
+        module.fail_json(msg="MCS Url Should be defined")
     else:
         if module.params['list_mapreduce_mode']:
             url_parameters = "get"
         elif mapReduceMode not in mapreduce_mode_list:
-            module.fail_json(msg="mapreduce mode should be classic or yarn only.")
-        elif mapReduceMode not None:
-            url_parameters = "set?mode=" + mapReduceMode
+            module.fail_json(msg="Mode should be classic or yarn only.")
+        elif mapReduceMode is not None:
+            url_parameters = "set?mode=" + module.params['mapreduce_mode']
         complete_url = "https://" + mcsUrl + ":" + mcsPort + \
-            "cluster/mapreduce/" + url_parameters
+            "/rest/cluster/mapreduce/" + url_parameters
         headers = {'Content-Type': 'application/json'}
         (resp, info) = fetch_url(module,
-                                 complete_url,
-                                 headers=headers,
-                                 method='GET')
+                                complete_url,
+                                headers=headers,
+                                method='GET')
         if info['status'] >= 400:
             module.fail_json(msg="Unauthorized Access to MapR Services")
         elif info['status'] == 200:
@@ -149,7 +153,8 @@ def main():
             if body['status'] == 'ERROR':
                 module.fail_json(msg=body['errors'][0]['desc'])
             else:
-                module.exit_json(changed=True)
+                mapreduceMode = body['data'][0]['default_mode']
+                module.exit_json(changed=True, default_mode=mapreduceMode)
         else:
             module.fail_json(
                 msg="Unknown Response from MapR API: %s" % resp.read())
