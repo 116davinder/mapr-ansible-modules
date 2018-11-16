@@ -105,7 +105,8 @@ def main():
             mcs_url=dict(type='str', required=True),
             mcs_port=dict(type='str', default='8443', required=False),
             validate_certs=dict(type='bool', default=False),
-            list_mapreduce_mode=dict(type='bool', default=True, required=False),
+            list_mapreduce_mode=dict(type='bool', default=True,
+                                     required=False),
             mapreduce_mode=dict(type='str', required=False),
         )
     )
@@ -143,9 +144,9 @@ def main():
             "/rest/cluster/mapreduce/" + url_parameters
         headers = {'Content-Type': 'application/json'}
         (resp, info) = fetch_url(module,
-                                complete_url,
-                                headers=headers,
-                                method='GET')
+                                 complete_url,
+                                 headers=headers,
+                                 method='GET')
         if info['status'] >= 400:
             module.fail_json(msg="Unauthorized Access to MapR Services")
         elif info['status'] == 200:
