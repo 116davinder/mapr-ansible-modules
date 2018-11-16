@@ -6,16 +6,16 @@
 export ANSIBLE_LIBRARY=\`pwd\`
 
 ## list of modules
-* mapr_service
+* mapr_node_services
 * mapr_blacklistuser
 * mapr_cluster_mapreduce
 ```
 To manage mapr services using rest api.
 ```
 
-### examples for mapr_service
+### examples for mapr_node_services
 ```
-- mapr_service:
+- mapr_node_services:
     username: mapr
     password: mapr
     service_name: nfs
