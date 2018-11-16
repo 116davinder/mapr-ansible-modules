@@ -8,6 +8,7 @@ export ANSIBLE_LIBRARY=\`pwd\`
 ## list of modules
 * mapr_service
 * mapr_blacklistuser
+* mapr_cluster_mapreduce
 ```
 To manage mapr services using rest api.
 ```
@@ -41,4 +42,24 @@ To manage mapr services using rest api.
     mcs_port: 8443
     validate_certs: false
     user: test
+```
+
+### examples for mapr_cluster_mapreduce
+```
+- mapr_cluster_mapreduce:
+    username: mapr
+    password: mapr
+    mcs_url: demo.mapr.com
+    mcs_port: 8443
+    validate_certs: false
+    list_mapreduce_mode: true
+
+- mapr_cluster_mapreduce:
+    username: mapr
+    password: mapr
+    mcs_url: demo.mapr.com
+    mcs_port: 8443
+    validate_certs: false
+    list_mapreduce_mode: false
+    mapreduce_mode: classic/yarn
 ```

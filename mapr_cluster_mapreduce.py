@@ -13,14 +13,15 @@ ANSIBLE_METADATA = {'metadata_version': '1.1', 'status': ['preview'],
 
 DOCUMENTATION = '''
 ---
-module: mapr_blacklistuser
+module: mapr_cluster_mapreduce
 version_added: "0.1"
 author: "Davinder Pal (@116davinder)"
-short_description: Add user to mapr blacklist
+short_description: Get/Set mapreduce mode.
 description:
-   - Manage MapR BlackList Services
-     if you want to remove user from blacklist
-     (https://mapr.com/docs/52/SecurityGuide/HowTicketsWork.html)
+   - Manage MapR MapReduce Mode
+     we can get current mapreduce mode.
+     we can change current mapreduce mode.
+     (https://mapr.com/docs/61/ReferenceGuide/cluster-mapreduce-set.html)
 options:
   username:
     description:
@@ -51,16 +52,15 @@ options:
     required: false
     default: 'yes'
     type: bool
-  list_user:
+  list_mapreduce_mode:
     description:
-      - If C(no), SSL certificates will not be validated.
-        This should only be used for personal self-signed certificates.
-    required: false
+      - if true then mapreduce should be set.
+        else it will return current mapreduce mode of cluster.
+    required: true
     type: bool
-  user:
+  mapreduce_mode:
     description:
-      - If C(no), SSL certificates will not be validated.
-        This should only be used for personal self-signed certificates.
+      - either classic or yarn mode are supported.
     required: false
     type: string
 
@@ -69,21 +69,22 @@ options:
 '''
 
 EXAMPLES = '''
-- mapr_blacklistuser:
+- mapr_cluster_mapreduce:
     username: mapr
     password: mapr
     mcs_url: demo.mapr.com
     mcs_port: 8443
     validate_certs: false
-    list_user: true
+    list_mapreduce_mode: true
 
-- mapr_blacklistuser:
+- mapr_cluster_mapreduce:
     username: mapr
     password: mapr
     mcs_url: demo.mapr.com
     mcs_port: 8443
     validate_certs: false
-    user: test
+    list_mapreduce_mode: false
+    mapreduce_mode: classic/yarn
 '''
 
 from ansible.module_utils.basic import AnsibleModule
@@ -104,33 +105,43 @@ def main():
             mcs_url=dict(type='str', required=True),
             mcs_port=dict(type='str', default='8443', required=False),
             validate_certs=dict(type='bool', default=False),
-            list_user=dict(type='bool', default=True, required=False),
-            user=dict(type='str', required=False),
+            list_mapreduce_mode=dict(type='bool', default=True,
+                                     required=False),
+            mapreduce_mode=dict(type='str', required=False),
         )
     )
+
+    # default value
+    mapReduceMode = None
 
     maprUsername = module.params['username']
     maprPassword = module.params['password']
     mcsUrl = module.params['mcs_url']
     mcsPort = module.params['mcs_port']
 
+    if not module.params['list_mapreduce_mode']:
+        mapReduceMode = module.params['mapreduce_mode'].lower()
+
     # Hack to add basic auth username and password the way fetch_url expects
     module.params['url_username'] = maprUsername
     module.params['url_password'] = maprPassword
 
+    # options for mapreduce mode
+    mapreduce_mode_list = ['classic', 'yarn']
+
     if not maprUsername or not maprPassword:
         module.fail_json(msg="Username and Password should be defined")
     elif not mcsUrl:
-        module.fail_json(msg="MCS Url Should be Defined")
-    elif module.params['list_user'] and module.params['user'] not None:
-        module.fail_json(msg="Only define one of list_user or user")
+        module.fail_json(msg="MCS Url Should be defined")
     else:
-        if module.params['list_user']:
-            url_parameters = "listusers"
-        elif module.params['user'] not None:
-            url_parameters = "users?name=" + module.params['user']
+        if module.params['list_mapreduce_mode']:
+            url_parameters = "get"
+        elif mapReduceMode not in mapreduce_mode_list:
+            module.fail_json(msg="Mode should be classic or yarn only.")
+        elif mapReduceMode is not None:
+            url_parameters = "set?mode=" + module.params['mapreduce_mode']
         complete_url = "https://" + mcsUrl + ":" + mcsPort + \
-            "/rest/blacklist/" + url_parameters
+            "/rest/cluster/mapreduce/" + url_parameters
         headers = {'Content-Type': 'application/json'}
         (resp, info) = fetch_url(module,
                                  complete_url,
@@ -143,7 +154,8 @@ def main():
             if body['status'] == 'ERROR':
                 module.fail_json(msg=body['errors'][0]['desc'])
             else:
-                module.exit_json(changed=True)
+                mapreduceMode = body['data'][0]['default_mode']
+                module.exit_json(changed=True, default_mode=mapreduceMode)
         else:
             module.fail_json(
                 msg="Unknown Response from MapR API: %s" % resp.read())
