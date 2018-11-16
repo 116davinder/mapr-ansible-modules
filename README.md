@@ -1,7 +1,9 @@
-## MapR Ansible Modules
-
 [![Build Status](https://travis-ci.org/116davinder/mapr-ansible-modules.svg?branch=master)]
 
+## MapR Ansible Modules
+```
+To manage mapr services using rest api.
+```
 ## export ansible library path
 export ANSIBLE_LIBRARY=\`pwd\`
 
@@ -9,9 +11,7 @@ export ANSIBLE_LIBRARY=\`pwd\`
 * mapr_node_services
 * mapr_blacklistuser
 * mapr_cluster_mapreduce
-```
-To manage mapr services using rest api.
-```
+* mapr_node_cldbmaster
 
 ### examples for mapr_node_services
 ```
@@ -62,4 +62,14 @@ To manage mapr services using rest api.
     validate_certs: false
     list_mapreduce_mode: false
     mapreduce_mode: classic/yarn
+```
+
+### examples for mapr_node_cldbmaster
+```
+- mapr_node_cldbmaster:
+    username: mapr
+    password: mapr
+    mcs_url: demo.mapr.com
+    mcs_port: 8443
+    validate_certs: false
 ```
