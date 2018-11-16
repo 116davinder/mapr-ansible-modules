@@ -13,7 +13,7 @@ ANSIBLE_METADATA = {'metadata_version': '1.1', 'status': ['preview'],
 
 DOCUMENTATION = '''
 ---
-module: mapr_service
+module: mapr_node_services
 version_added: "0.1"
 author: "Davinder Pal (@116davinder)"
 short_description: Manage MapR Services by rest api.
@@ -65,7 +65,7 @@ options:
 '''
 
 EXAMPLES = '''
-- mapr_service:
+- mapr_node_services:
     username: mapr
     password: mapr
     service_name: nfs
