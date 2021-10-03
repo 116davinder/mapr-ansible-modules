@@ -1,5 +1,7 @@
 [![Build Status](https://travis-ci.org/116davinder/mapr-ansible-modules.svg?branch=master)]
 
+migrated to https://github.com/116davinder/ansible.missing_collection
+
 ## MapR Ansible Modules
 ```
 To manage mapr services using rest api.
